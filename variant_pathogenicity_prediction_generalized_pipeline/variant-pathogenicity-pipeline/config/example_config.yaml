@@ -1,0 +1,179 @@
+# =============================================================================
+# Variant Pathogenicity Pipeline — Configuration File
+# =============================================================================
+# This file defines all project-specific parameters. Copy and edit for your
+# own gene set. All paths are relative to working_dir unless absolute.
+# =============================================================================
+
+# ─── Paths ────────────────────────────────────────────────────────────────────
+paths:
+  working_dir: "/path/to/your/project"
+  results_dir: "results"                   # relative to working_dir
+  structures_dir: "structures"             # searched for PDB/CIF files
+  variants_file: "variants_annotated.csv"  # relative to working_dir
+
+  # Optional: pre-computed DDG files (skip FoldX if these exist)
+  monomer_ddg_file: "foldx_ddg_monomer_results_all.csv"   # or null
+  multimer_ddg_file: "foldx_ddg_multimer_results.csv"     # or null
+  per_partner_ddg_file: "foldx_ddg_per_partner.csv"       # or null
+
+  # External tools
+  foldx_binary: "/path/to/foldx"           # null to skip DDG computation
+  dssp_binary: "mkdssp"                    # or full path; null to skip SS
+
+# ─── Structure Definitions ────────────────────────────────────────────────────
+# Monomer structures: one entry per gene.
+# plddt_source: "cif" if PDB B-factors are zeroed (common with AlphaFold
+#   ColabFold outputs); "pdb" if PDB B-factors contain valid pLDDT.
+monomers:
+  shroom3:
+    cif: "fold_shroom3_model_0.cif"
+    pdb: "fold_shroom3_model_0.pdb"
+    plddt_source: cif
+  zic3:
+    cif: "fold_zic3_model_0.cif"
+    pdb: "fold_zic3_model_0.pdb"
+    plddt_source: cif
+  rock2:
+    pdb: "rock2.pdb"
+    plddt_source: pdb
+  gli3:
+    pdb: "gli3.pdb"
+    plddt_source: pdb
+  # ... add all genes here
+
+# Multimer structures: one entry per complex.
+# gene: the gene whose variants are on chain_gene.
+# partner: a unique label for this interaction partner.
+# chain_gene / chain_partner: PDB chain IDs.
+# primary: true if this is a biologically primary complex (affects reporting).
+multimers:
+  - gene: shroom3
+    partner: rock2
+    pdb: "fold_shroom3_rock2_model_0.pdb"
+    cif: null
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: shroom3
+    partner: dvl2
+    pdb: "fold_shroom3_dvl2_model_0.pdb"
+    cif: "fold_shroom3_dvl2_model_0.cif"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: zic3
+    partner: gli3
+    pdb: "fold_zic3_gli3_model_0.pdb"
+    cif: "fold_zic3_gli3_model_0.cif"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+  # ... add all complexes here
+
+# ─── Construct Offsets ────────────────────────────────────────────────────────
+# For genes where a multimer uses a truncated construct, specify the offset
+# so full-length variant positions can be mapped to construct-local positions.
+# offset = N means: construct_pos = full_length_pos - N
+# Variants at positions ≤ N are outside the construct and get null values.
+construct_offsets:
+  cdh2:
+    cdh2_truncated: 159    # mature CDH2, starts at full-length pos 160
+    cdh2_cyto: 745         # cytoplasmic domain, starts at pos 746
+  # Add entries for any gene with truncated constructs
+
+# ─── Partner Normalization ────────────────────────────────────────────────────
+# FoldX output labels partners by protein name. When running a variant from
+# gene X in complex X-Y, FoldX calls the partner "Y". But for reciprocal
+# complexes (running a Y variant in complex X-Y), FoldX calls the partner "X".
+# This maps FoldX partner names back to the correct partner labels.
+#
+# Format: foldx_name → { variant_gene → correct_partner_label }
+# Only needed for ambiguous or reciprocal cases.
+partner_normalization:
+  cdh2:
+    _default: cdh2_truncated     # bare "cdh2" in FoldX → cdh2_truncated
+  shroom3:                       # "shroom3" as partner label (reciprocal)
+    rock2: rock2
+    dvl2: dvl2
+    cdh2: cdh2_truncated
+    ctnnb1: ctnnb1
+  zic3:                          # "zic3" as partner label (reciprocal)
+    gli3: gli3
+
+# ─── Variant CSV Column Mapping ───────────────────────────────────────────────
+# Map your input CSV column names to pipeline-internal names.
+# The pipeline expects: gene, position, ref_aa, alt_aa
+# Plus optional annotation columns.
+columns:
+  gene: "gene"
+  position: "position"
+  ref_aa: "ref_aa"
+  alt_aa: "alt_aa"
+  # Optional annotation columns (set to null if not present)
+  alphamissense: "alphamissense"
+  alphamissense_pathogenicity: "alphamissense_pathogenicity"
+  franklin: "franklin"
+  gnomad_af: "gnomad_af"
+  gnomad_popmax_af: "gnomad_popmax_af"
+  gnomad_homozygotes: "gnomad_homozygotes"
+  gene_pli: "gene_pli"
+  gene_loeuf: "gene_loeuf"
+
+# ─── Thresholds ───────────────────────────────────────────────────────────────
+thresholds:
+  # pLDDT
+  plddt_confident: 50           # minimum for DDG confidence gating
+  plddt_high: 70                # "high" confidence category
+  plddt_very_high: 90           # "very high" confidence category
+
+  # DDG (kcal/mol)
+  ddg_destabilizing: 1.0        # |DDG| > this → significant
+  ddg_highly_destabilizing: 2.0 # |DDG| > this → highly significant
+
+  # Contact disruption → score points
+  disruption_points:
+    - [20, 4.0]
+    - [10, 3.0]
+    - [4, 2.0]
+    - [1, 1.0]
+
+  # Tier thresholds (score ≥ threshold → tier)
+  tiers:
+    - [5.0, "Tier 1"]
+    - [3.0, "Tier 2"]
+    - [1.5, "Tier 3"]
+  default_tier: "Tier 4"
+
+  # Contact-driven mechanism split
+  contact_driven_threshold: 6
+
+  # AlphaMissense classification
+  am_pathogenic: 0.564
+  am_benign: 0.340
+
+  # Neighborhood window
+  neighborhood_radius: 3
+  neighborhood_weights: {0: 1.00, 1: 0.75, 2: 0.50, 3: 0.25}
+
+  # Structure extraction
+  contact_distance: 5.0         # Å cutoff for residue-residue contacts
+  sequence_separation: 3        # minimum sequence distance for contacts
+
+# ─── FoldX Settings ───────────────────────────────────────────────────────────
+foldx:
+  n_runs: 3                     # BuildModel replicates (averaged)
+  timeout: 300                  # seconds per FoldX call
+  run_missing_monomer: true     # auto-run BuildModel for missing monomer DDG
+  run_missing_multimer: true    # auto-run for missing interface multimer DDG
+
+# ─── Output Settings ──────────────────────────────────────────────────────────
+output:
+  csv_filename: "variant_comprehensive.csv"
+  xlsx_filename: "variant_comprehensive.xlsx"
+  high_priority_filename: "high_priority_variants.csv"
+  ddg_expanded_filename: "foldx_ddg_expanded_results.csv"
+  xlsx_sheets: true             # generate multi-sheet XLSX
+  include_legacy_columns: false # include v5.2 compatibility columns

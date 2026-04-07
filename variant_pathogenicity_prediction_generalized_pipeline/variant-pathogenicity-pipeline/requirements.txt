@@ -1,0 +1,5 @@
+biopython>=1.82
+pandas>=2.0
+numpy>=1.24
+pyyaml>=6.0
+openpyxl>=3.1

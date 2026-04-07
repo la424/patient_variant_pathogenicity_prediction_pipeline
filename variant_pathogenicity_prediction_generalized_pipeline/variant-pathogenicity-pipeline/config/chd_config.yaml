@@ -1,0 +1,229 @@
+# =============================================================================
+# CHD Variant Pathogenicity Pipeline — Project Configuration
+# =============================================================================
+# This configuration reproduces the CHD candidate gene analysis from the
+# original Jupyter notebook pipeline (v6.0-A3).
+# =============================================================================
+
+paths:
+  working_dir: "/Users/lukearnce/PyCharmMiscProject"
+  results_dir: "results"
+  structures_dir: "structures"
+  variants_file: "variants_with_alphamissense_and_franklin_expanded.csv"
+  monomer_ddg_file: "foldx_ddg_monomer_results_all.csv"
+  multimer_ddg_file: "foldx_ddg_multimer_results.csv"
+  per_partner_ddg_file: "results/foldx_ddg_per_partner.csv"
+  foldx_binary: "/Users/lukearnce/Downloads/foldx5_Mac_0/foldx_20270131"
+  dssp_binary: "/opt/homebrew/bin/mkdssp"
+
+# ─── Monomer Structures ──────────────────────────────────────────────────────
+# plddt_source: "cif" for genes where PDB B-factors are zeroed
+monomers:
+  shroom3:
+    cif: "fold_shroom3_model_0.cif"
+    pdb: "fold_shroom3_model_0.pdb"
+    plddt_source: cif
+  zic3:
+    cif: "fold_zic3_model_0.cif"
+    pdb: "fold_zic3_model_0.pdb"
+    plddt_source: cif
+  cdh2:
+    cif: "fold_cdh2_model_0.cif"
+    pdb: "fold_cdh2_model_0.pdb"
+    plddt_source: cif
+  dvl2:
+    cif: "fold_dvl2_model_0.cif"
+    pdb: "fold_dvl2_model_0.pdb"
+    plddt_source: cif
+  ctnnb1:
+    cif: "fold_ctnnb1_model_0.cif"
+    pdb: "fold_ctnnb1_model_0.pdb"
+    plddt_source: cif
+  actb:
+    cif: "fold_actb_model_0.cif"
+    pdb: "fold_actb_model_0.pdb"
+    plddt_source: cif
+  rock2:
+    pdb: "rock2.pdb"
+    plddt_source: pdb
+  gli3:
+    pdb: "gli3.pdb"
+    plddt_source: pdb
+  kpna1:
+    pdb: "kpna1.pdb"
+    plddt_source: pdb
+  kpna6:
+    pdb: "kpna6.pdb"
+    plddt_source: pdb
+  mdfi:
+    pdb: "mdfi.pdb"
+    plddt_source: pdb
+  tcf7l1:
+    pdb: "tcf7l1.pdb"
+    plddt_source: pdb
+
+# ─── Multimer Complexes ──────────────────────────────────────────────────────
+multimers:
+  # SHROOM3 complexes
+  - gene: shroom3
+    partner: actin
+    cif: "fold_shroom3_actin_chain_model_0.cif"
+    pdb: "fold_shroom3_actin_chain_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: shroom3
+    partner: actb
+    cif: "fold_shroom3_actb_model_0.cif"
+    pdb: "fold_shroom3_actb_model_0.pdb"
+    chain_gene: B
+    chain_partner: A
+    primary: false
+
+  - gene: shroom3
+    partner: dvl2
+    cif: "fold_shroom3_dvl2_model_0.cif"
+    pdb: "fold_shroom3_dvl2_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: shroom3
+    partner: cdh2_truncated
+    cif: "fold_shroom3_cdh2_truncated_model_0.cif"
+    pdb: "fold_shroom3_cdh2_truncated_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: false
+
+  - gene: shroom3
+    partner: ctnnb1
+    cif: "fold_shroom3_ctnnb1_model_0.cif"
+    pdb: "fold_shroom3_ctnnb1_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: shroom3
+    partner: cdh2_cyto
+    cif: "fold_shroom3_cdh2_cytoplasmic_domain_model_0.cif"
+    pdb: "fold_shroom3_cdh2_cytoplasmic_domain.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: shroom3
+    partner: actb_no_bind
+    cif: "fold_shroom3_no_actin_binding_actb_chain_model_0.cif"
+    pdb: "fold_shroom3_no_actin_binding_actb_chain.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: false
+
+  - gene: shroom3
+    partner: rock2
+    cif: null
+    pdb: "fold_shroom3_rock2_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  # ZIC3 complexes
+  - gene: zic3
+    partner: gli3
+    cif: "fold_zic3_gli3_model_0.cif"
+    pdb: "fold_zic3_gli3_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: zic3
+    partner: kpna1
+    cif: "fold_zic3_kpna1_model_0.cif"
+    pdb: "fold_zic3_kpna1_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: zic3
+    partner: kpna6
+    cif: "fold_zic3_kpna6_model_0.cif"
+    pdb: "fold_zic3_kpna6_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: zic3
+    partner: mdfi
+    cif: "fold_zic3_mdfi_model_0.cif"
+    pdb: "fold_zic3_mdfi_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+  - gene: zic3
+    partner: tcf7l1
+    cif: "fold_zic3_tcf7l1_model_0.cif"
+    pdb: "fold_zic3_tcf7l1_model_0.pdb"
+    chain_gene: A
+    chain_partner: B
+    primary: true
+
+# ─── Construct Offsets ────────────────────────────────────────────────────────
+construct_offsets:
+  cdh2:
+    cdh2_truncated: 159    # mature CDH2 without propeptide
+    cdh2_cyto: 745         # cytoplasmic domain only
+
+# ─── Partner Normalization ────────────────────────────────────────────────────
+partner_normalization:
+  cdh2:
+    _default: cdh2_truncated
+  shroom3:
+    rock2: rock2
+    dvl2: dvl2
+    cdh2: cdh2_truncated
+    ctnnb1: ctnnb1
+  zic3:
+    gli3: gli3
+
+# ─── Thresholds (defaults match v6.0-A3) ─────────────────────────────────────
+thresholds:
+  plddt_confident: 50
+  plddt_high: 70
+  plddt_very_high: 90
+  ddg_destabilizing: 1.0
+  ddg_highly_destabilizing: 2.0
+  disruption_points:
+    - [20, 4.0]
+    - [10, 3.0]
+    - [4, 2.0]
+    - [1, 1.0]
+  tiers:
+    - [5.0, "Tier 1"]
+    - [3.0, "Tier 2"]
+    - [1.5, "Tier 3"]
+  default_tier: "Tier 4"
+  contact_driven_threshold: 6
+  am_pathogenic: 0.564
+  am_benign: 0.340
+  neighborhood_radius: 3
+  neighborhood_weights: {0: 1.00, 1: 0.75, 2: 0.50, 3: 0.25}
+  contact_distance: 5.0
+  sequence_separation: 3
+
+# ─── FoldX Settings ──────────────────────────────────────────────────────────
+foldx:
+  n_runs: 3
+  timeout: 300
+  run_missing_monomer: true
+  run_missing_multimer: true
+
+# ─── Output ──────────────────────────────────────────────────────────────────
+output:
+  csv_filename: "variant_comprehensive_v6_0.csv"
+  xlsx_filename: "variant_comprehensive_v6_0.xlsx"
+  high_priority_filename: "high_priority_variants_v6_0.csv"
+  ddg_expanded_filename: "foldx_ddg_expanded_results.csv"
+  xlsx_sheets: true
