@@ -1,0 +1,10 @@
+gene,position,ref_aa,alt_aa
+shroom3,35,G,V
+shroom3,60,G,V
+shroom3,106,V,L
+shroom3,793,Q,P
+zic3,402,S,P
+zic3,442,P,H
+rock2,136,F,C
+rock2,367,T,M
+cdh2,118,A,T
